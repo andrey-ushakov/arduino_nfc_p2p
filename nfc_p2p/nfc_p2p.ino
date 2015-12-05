@@ -20,7 +20,7 @@ uint8_t setRequestNdef(uint8_t *buffer, uint8_t request);
 uint8_t setActionNdef(uint8_t *buffer, uint8_t action);
 void print_ndef(const uint8_t *buffer, uint8_t length);
 
-
+bool isMsgInBuffer = false;
 
 void setup() {
   Serial.begin(115200);
@@ -33,20 +33,23 @@ void loop() {
   
   Serial.println("\n\n============ Start ============");
   
+  if(!isMsgInBuffer) {
+    readFromSerial();
+    Serial.print("I received from serial : ");
+    printSerialMessage();
+    isMsgInBuffer = true;
+  }
   
-  readFromSerial();
-  Serial.print("I received from serial : ");
-  printSerialMessage();
-  
-  result = nfc.poll(500);
+  result = nfc.poll(10000);
   
   if (result == 1) { // client
       Serial.println("Client peer");
       
-      if(msgLength > 0) {          // try to send
+      if(isMsgInBuffer && msgLength > 0) {          // send message
         // send to server
-        length = setCharNdef(ndefBuf, bufferMsg, sizeof(bufferMsg));
+        length = setCharNdef(ndefBuf, bufferMsg, msgLength*sizeof(uint8_t));
         nfc.put(ndefBuf, length); // send character data
+        isMsgInBuffer = false;
         Serial.println("Client : Msg was sended");
       } else {
         Serial.println("Client : Nothing to send");
