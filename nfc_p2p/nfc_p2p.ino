@@ -34,82 +34,40 @@ void loop() {
   Serial.println("\n\n============ Start ============");
   
   
+  readFromSerial();
+  Serial.print("I received from serial : ");
+  printSerialMessage();
   
-  
-  
-  result = nfc.poll();
-  //Serial.print("Res : ");
-  //Serial.println(result);
+  result = nfc.poll(500);
   
   if (result == 1) { // client
-    while(true) {
       Serial.println("Client peer");
-      readFromSerial();
-      Serial.print("I received from serial : ");
-      printSerialMessage();
       
       if(msgLength > 0) {          // try to send
         // send to server
         length = setCharNdef(ndefBuf, bufferMsg, sizeof(bufferMsg));
         nfc.put(ndefBuf, length); // send character data
-        Serial.println("Msg was sended");
-      } else {                      // try to receive
-        Serial.println("Nothing to send");
-        // TODO
-        length = setRequestNdef(ndefBuf, QA_CHARACTER);
-        length16 = nfc.get(ndefBuf, length, sizeof(ndefBuf)); // get peer character data
-        if(length16 > 0) {
-          print_ndef(ndefBuf, length16);
-        } else {
-          Serial.println("Nothing to receive");
-        }
+        Serial.println("Client : Msg was sended");
+      } else {
+        Serial.println("Client : Nothing to send");
       }
-      
-      delay(3000);
-    }
+
   }
   
   else if (result == 2) { // server
-    while(true) {
       Serial.println("Server peer");
-      readFromSerial();
-      Serial.print("I received from serial : ");
-      printSerialMessage();
       
-      if(msgLength > 0) {          // try to send
-        // TODO
-        Serial.println("try to send");
-        length = setCharNdef(ndefBuf, bufferMsg, sizeof(bufferMsg));
-        nfc.serve(ndefBuf, length); // send character data
-      
-      } else {                      // try to receive
-        Serial.println("Nothing to send");
-        length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
-        if(length16 > 0) {
-          print_ndef(ndefBuf, length16);
-        } else {
-          Serial.println("Nothing to receive");
-        }
+      length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
+      if(length16 > 0) {
+        print_ndef(ndefBuf, length16);
+      } else {
+        Serial.println("Server : Nothing to receive");
       }
-      
-      delay(3000);
-    }
-    
   }
+  else{
+      Serial.println("timeout");
+    }
   
-  
-  
-  ///////
-  /*readFromSerial();
-    
-  if(msgLength > 0) {
-    // say what you got:
-    Serial.print("I received from serial : ");
-    printSerialMessage();
-
-  } else {
-    Serial.println("Nothing");
-  }*/
   
   delay(3000);
 
