@@ -24,7 +24,7 @@ void print_ndef_payload(const uint8_t *buffer, uint8_t length);
 bool isMsgInBuffer = false;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -32,12 +32,12 @@ void loop() {
   uint8_t length;
   int16_t length16;
   
-  Serial.println("\n\n============ Start ============");
+  //Serial.println("\n\n============ Start ============");
   
   if(!isMsgInBuffer) {
     readFromSerial();
-    Serial.print("I received from serial : ");
-    printSerialMessage();
+    //Serial.print("I received from serial : ");
+    //printSerialMessage();
     if(msgLength > 0) {
       isMsgInBuffer = true;
     }
@@ -46,38 +46,39 @@ void loop() {
   result = nfc.poll();
   
   if (result == 1) { // client
-      Serial.println("Client peer");
+      //Serial.println("Client peer");
       
       if(isMsgInBuffer && msgLength > 0) {          // send message
         // send to server
         length = setCharNdef(ndefBuf, bufferMsg, msgLength*sizeof(uint8_t));
         nfc.put(ndefBuf, length); // send character data
         isMsgInBuffer = false;
-        Serial.println("Client : Msg was sended");
+        //Serial.println("Client : Msg was sent");
       } else {
-        Serial.println("Client : Nothing to send");
+        //Serial.println("Client : Nothing to send");
       }
 
   }
   
   else if (result == 2) { // server
-      Serial.println("Server peer");
+      //Serial.println("Server peer");
       
       length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
       if(length16 > 0) {
         //print_ndef(ndefBuf, length16);
         print_ndef_payload(ndefBuf, length16);
       } else {
-        Serial.println("Server : Nothing to receive");
+        //Serial.println("Server : Nothing to receive");
       }
   }
   else{
-      Serial.println("timeout");
+      //Serial.println("timeout");
     }
   
   
-  Serial.print("disconnect: ");
-  Serial.println(nfc.disconnect(500));
+  //Serial.print("disconnect: ");
+  int discRes = nfc.disconnect(500);
+  //Serial.println(discRes);
   delay(3000);
 
 }
