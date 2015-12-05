@@ -37,7 +37,9 @@ void loop() {
     readFromSerial();
     Serial.print("I received from serial : ");
     printSerialMessage();
-    isMsgInBuffer = true;
+    if(msgLength > 0) {
+      isMsgInBuffer = true;
+    }
   }
   
   result = nfc.poll();
