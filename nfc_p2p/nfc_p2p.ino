@@ -33,9 +33,7 @@ void loop() {
   
   Serial.println("\n\n============ Start ============");
   
-  readFromSerial();
-  Serial.print("I received from serial : ");
-  printSerialMessage();
+  
   
   
   
@@ -46,6 +44,9 @@ void loop() {
   if (result == 1) { // client
     while(true) {
       Serial.println("Client peer");
+      readFromSerial();
+      Serial.print("I received from serial : ");
+      printSerialMessage();
       
       if(msgLength > 0) {          // try to send
         // send to server
@@ -71,6 +72,9 @@ void loop() {
   else if (result == 2) { // server
     while(true) {
       Serial.println("Server peer");
+      readFromSerial();
+      Serial.print("I received from serial : ");
+      printSerialMessage();
       
       if(msgLength > 0) {          // try to send
         // TODO
