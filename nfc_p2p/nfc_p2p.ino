@@ -40,7 +40,7 @@ void loop() {
     isMsgInBuffer = true;
   }
   
-  result = nfc.poll(10000);
+  result = nfc.poll();
   
   if (result == 1) { // client
       Serial.println("Client peer");
