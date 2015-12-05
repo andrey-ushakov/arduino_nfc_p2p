@@ -19,6 +19,7 @@ uint8_t setCharNdef(uint8_t *buffer, const uint8_t *character, uint8_t length);
 uint8_t setRequestNdef(uint8_t *buffer, uint8_t request);
 uint8_t setActionNdef(uint8_t *buffer, uint8_t action);
 void print_ndef(const uint8_t *buffer, uint8_t length);
+void print_ndef_payload(const uint8_t *buffer, uint8_t length);
 
 bool isMsgInBuffer = false;
 
@@ -64,7 +65,8 @@ void loop() {
       
       length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
       if(length16 > 0) {
-        print_ndef(ndefBuf, length16);
+        //print_ndef(ndefBuf, length16);
+        print_ndef_payload(ndefBuf, length16);
       } else {
         Serial.println("Server : Nothing to receive");
       }
@@ -75,7 +77,7 @@ void loop() {
   
   
   Serial.print("disconnect: ");
-  Serial.println(nfc.disconnect(3000));
+  Serial.println(nfc.disconnect(500));
   delay(3000);
 
 }
@@ -116,16 +118,15 @@ void print_ndef(const uint8_t *buffer, uint8_t length) {
   message.print();
 }
 
-
-uint8_t setRequestNdef(uint8_t *buffer, uint8_t request) {
-  buffer[0] = 0xD4;
-  buffer[1] = sizeof(header);
-  buffer[2] = 0x01;
-  
-  header[buffer[1] - 1] = 0x51;
-  
-  memcpy(buffer + 3, header, buffer[1]);
-  buffer[3 + buffer[1]] = request;
-  
-  return 3 + buffer[1] + buffer[2];
+void print_ndef_payload(const uint8_t *buffer, uint8_t length) {
+  NdefMessage message = NdefMessage(buffer, length);
+  NdefRecord record = message.getRecord(0);
+  int len = record.getPayloadLength();
+  for (int szPos=0; szPos < len; szPos++) {
+    if (record._payload[szPos] <= 0x1F)
+      Serial.print(".");
+    else
+      Serial.print((char)record._payload[szPos]);
+  }
+  Serial.println("");
 }
