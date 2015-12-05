@@ -31,34 +31,58 @@ void loop() {
   uint8_t length;
   int16_t length16;
   
-  Serial.println("Start...");
+  Serial.println("\n\n============ Start ============");
+  
+  readFromSerial();
+  Serial.print("I received from serial : ");
+  printSerialMessage();
+  
+  
   
   result = nfc.poll();
-  Serial.print("Res : ");
-  Serial.println(result);
-  
+  //Serial.print("Res : ");
+  //Serial.println(result);
   
   if (result == 1) { // client
     Serial.println("Client peer");
-    readFromSerial();
     
-    if(msgLength > 0) {
-      // say what you got:
-      Serial.print("I received from serial : ");
-      printSerialMessage();
-      
+    if(msgLength > 0) {          // try to send
       // send to server
       length = setCharNdef(ndefBuf, bufferMsg, sizeof(bufferMsg));
       nfc.put(ndefBuf, length); // send character data
-    } else {
+      Serial.println("Msg was sended");
+    } else {                      // try to receive
       Serial.println("Nothing to send");
+      // TODO
+      length = setRequestNdef(ndefBuf, QA_CHARACTER);
+      length16 = nfc.get(ndefBuf, length, sizeof(ndefBuf)); // get peer character data
+      if(length16 > 0) {
+        print_ndef(ndefBuf, length16);
+      } else {
+        Serial.println("Nothing to receive");
+      }
     }
   }
   
   else if (result == 2) { // server
     Serial.println("Server peer");
-    length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
-    print_ndef(ndefBuf, length16);
+    
+    if(msgLength > 0) {          // try to send
+      // TODO
+      Serial.println("try to send");
+      length = setCharNdef(ndefBuf, bufferMsg, sizeof(bufferMsg));
+      nfc.serve(ndefBuf, length); // send character data
+    
+    } else {                      // try to receive
+      Serial.println("Nothing to send");
+      length16 = nfc.serve(ndefBuf, sizeof(ndefBuf)); // get peer character data
+      if(length16 > 0) {
+        print_ndef(ndefBuf, length16);
+      } else {
+        Serial.println("Nothing to receive");
+      }
+    }
+    
   }
   
   
@@ -113,4 +137,18 @@ uint8_t setCharNdef(uint8_t *buffer, const uint8_t *character, uint8_t length) {
 void print_ndef(const uint8_t *buffer, uint8_t length) {
   NdefMessage message = NdefMessage(buffer, length);
   message.print();
+}
+
+
+uint8_t setRequestNdef(uint8_t *buffer, uint8_t request) {
+  buffer[0] = 0xD4;
+  buffer[1] = sizeof(header);
+  buffer[2] = 0x01;
+  
+  header[buffer[1] - 1] = 0x51;
+  
+  memcpy(buffer + 3, header, buffer[1]);
+  buffer[3 + buffer[1]] = request;
+  
+  return 3 + buffer[1] + buffer[2];
 }
