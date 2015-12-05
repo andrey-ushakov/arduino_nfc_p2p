@@ -72,6 +72,8 @@ void loop() {
     }
   
   
+  Serial.print("disconnect: ");
+  Serial.println(nfc.disconnect(3000));
   delay(3000);
 
 }
