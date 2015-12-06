@@ -62,7 +62,9 @@ void handleButtonEvents(GButton button, GEvent event) {
 void serialEvent (Serial myPort) {
   data = myPort.readStringUntil('\n');
   if(data != null) {
-    println("He: " + data);
-    chatArea.appendText("He: " + data);
+    int sID = data.charAt(0);
+    String msg = "He (" + str(sID) + ") :" + data.substring(1);
+    //println("He: " + data);
+    chatArea.appendText(msg);
   }
 }
