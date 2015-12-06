@@ -36,7 +36,6 @@ void draw() {
 public void displayEvent(String name, GEvent event) {
   switch(event) {
   case ENTERED:
-    println("ENTERED");
     String msg = msgField.getText();
     arduinoPort.write(msg);
     chatArea.appendText("Me: " + msg + "\n");

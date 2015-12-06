@@ -2,6 +2,12 @@
 #include "PN532_SPI.h"
 #include "snep.h"
 #include "NdefMessage.h"
+#include <EEPROM.h>
+
+// sID
+int address_sid_flag = 0;
+int address_sid = 1;
+int sID;
 
 #define QA_CHARACTER 0x00
 #define QA_RESULT    0x01
@@ -12,7 +18,7 @@ SNEP nfc(pn532spi);
 uint8_t ndefBuf[128];
 uint8_t header[] = {0x65, 0x78, 0x61, 0x6d, 0x70, 0x6c, 0x65, 0x2e, 0x63, 0x6f, 0x6d, 0x3a, 0x00};
 
-uint8_t bufferMsg[16];
+uint8_t bufferMsg[128];
 int msgLength = 0;
 
 uint8_t setCharNdef(uint8_t *buffer, const uint8_t *character, uint8_t length);
@@ -25,6 +31,13 @@ bool isMsgInBuffer = false;
 
 void setup() {
   Serial.begin(9600);
+  
+  // Get or generate sID
+  bool sid_flag = EEPROM.read(address_sid_flag);
+  if (!sid_flag) {
+    generateSid();
+  }
+  sID = EEPROM.read(address_sid);
 }
 
 void loop() {
@@ -130,4 +143,11 @@ void print_ndef_payload(const uint8_t *buffer, uint8_t length) {
       Serial.print((char)record._payload[szPos]);
   }
   Serial.println("");
+}
+
+void generateSid() {
+  randomSeed(analogRead(0));
+  EEPROM.write(address_sid, random(1,256));
+  EEPROM.write(address_sid_flag, true);
+  Serial.println("generate done");
 }

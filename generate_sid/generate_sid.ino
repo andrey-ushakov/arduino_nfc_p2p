@@ -15,7 +15,7 @@ void setup() {
 
 void generateSid() {
   randomSeed(analogRead(0));
-  EEPROM.write(address_sid, random(1,256););
+  EEPROM.write(address_sid, random(1,256));
   EEPROM.write(address_sid_flag, true);
   Serial.println("generate done");
 }
