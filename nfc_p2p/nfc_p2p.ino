@@ -7,7 +7,7 @@
 // sID
 int address_sid_flag = 0;
 int address_sid = 1;
-int sID;
+uint8_t sID;
 
 #define QA_CHARACTER 0x00
 #define QA_RESULT    0x01
@@ -63,6 +63,7 @@ void loop() {
       
       if(isMsgInBuffer && msgLength > 0) {          // send message
         // send to server
+        prependMessageBySid();
         length = setCharNdef(ndefBuf, bufferMsg, msgLength*sizeof(uint8_t));
         nfc.put(ndefBuf, length); // send character data
         isMsgInBuffer = false;
@@ -150,4 +151,13 @@ void generateSid() {
   EEPROM.write(address_sid, random(1,256));
   EEPROM.write(address_sid_flag, true);
   Serial.println("generate done");
+}
+
+void prependMessageBySid() {
+  
+  for(int i = msgLength-1; i>=0; --i) {
+    bufferMsg[i+1] = bufferMsg[i];
+  }
+  bufferMsg[0] = sID;
+  msgLength++;
 }
