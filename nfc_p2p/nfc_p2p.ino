@@ -154,10 +154,17 @@ void generateSid() {
 }
 
 void prependMessageBySid() {
-  
   for(int i = msgLength-1; i>=0; --i) {
     bufferMsg[i+1] = bufferMsg[i];
   }
   bufferMsg[0] = sID;
   msgLength++;
+  
+  /*for(int i = 0; i<msgLength; ++i) {
+    Serial.print(bufferMsg[i]);
+  }
+  Serial.println("");*/
 }
+
+//190
+//65533

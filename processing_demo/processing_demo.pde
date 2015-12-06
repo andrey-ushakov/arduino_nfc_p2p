@@ -2,7 +2,6 @@ import processing.serial.*;
 import g4p_controls.*;
 
 Serial arduinoPort;    // Create object from Serial class
-String data;     // Data received from the serial port
 
 GTextArea chatArea;
 int chatH = 150;
@@ -60,11 +59,25 @@ void handleButtonEvents(GButton button, GEvent event) {
 
 
 void serialEvent (Serial myPort) {
-  data = myPort.readStringUntil('\n');
-  if(data != null) {
-    int sID = data.charAt(0);
-    String msg = "He (" + str(sID) + ") :" + data.substring(1);
-    //println("He: " + data);
-    chatArea.appendText(msg);
+  
+  byte[] inBuffer = new byte[128];
+  while (myPort.available() > 0) {
+    //inBuffer = myPort.readBytes();
+    myPort.readBytes(inBuffer);
+    if (inBuffer != null) {
+      int cnt = 0;
+      for(int i=0; i<128; i++) {
+        if(int(inBuffer[i]) != 13) {
+          cnt++;
+        } else {
+          break;
+        }
+      }
+      
+      int sID = int(inBuffer[0]);
+      String strMsg = new String(inBuffer, 0, cnt);
+      String chatMsg = "He (" + int(sID) + ") :" + strMsg.substring(1);
+      chatArea.appendText(chatMsg);
+    }
   }
 }
