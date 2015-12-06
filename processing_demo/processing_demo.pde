@@ -9,6 +9,16 @@ GTextField msgField;
 int msgFieldH = 20;
 //GButton sendBtn;
 
+int sID = 0;
+int friendIds[] = new int[5];
+int friendsCnt = 0;
+color c1         = color(255, 0, 0);
+color c1_blink   = color(128, 0, 0);
+color c2         = color(0, 255, 0);
+color c2_blink   = color(0, 128, 0);
+color c3         = color(0, 0, 255);
+color c3_blink   = color(0, 0, 128);
+
 void setup() {
   size(800, 600);
   
@@ -29,6 +39,30 @@ void setup() {
 
 void draw() {
   background(204);
+  
+  noStroke();
+  textSize(32);
+  
+  //my planet
+  fill(c1);
+  ellipse(width/2, height/2-msgFieldH/2-chatH/2-5, 120, 120);
+  text(sID, width/2-30, height/2-msgFieldH/2-chatH/2-5 + 100);
+  
+  
+  
+  
+  
+  for (int i = 0; i < friendsCnt; i++) {
+    if(i == 0) {
+      fill(c2);
+      ellipse(120, 120, 90, 90);
+      text(friendIds[i], 90, 200);
+    } else if(i == 1) {
+      fill(c3);
+      ellipse(680, 120, 90, 90);
+      text(friendIds[i], 650, 200);
+    }
+  }
 }
 
 
@@ -59,7 +93,7 @@ void handleButtonEvents(GButton button, GEvent event) {
 
 
 void serialEvent (Serial myPort) {
-  
+  println("event !");
   byte[] inBuffer = new byte[128];
   while (myPort.available() > 0) {
     //inBuffer = myPort.readBytes();
@@ -73,11 +107,39 @@ void serialEvent (Serial myPort) {
           break;
         }
       }
+      println(cnt);
       
-      int sID = int(inBuffer[0]);
-      String strMsg = new String(inBuffer, 0, cnt);
-      String chatMsg = "He (" + int(sID) + ") :" + strMsg.substring(1);
-      chatArea.appendText(chatMsg);
+      //if(cnt == 1) {  // received own sID
+      //  sID = int(inBuffer[0]);
+      //} else {
+        int friendID = int(inBuffer[0]);
+        addFriend(friendID);
+        String strMsg = new String(inBuffer, 0, cnt);
+        String chatMsg = "He (" + int(friendID) + ") :" + strMsg.substring(1);
+        chatArea.appendText(chatMsg);
+      //}
     }
   }
+}
+
+
+
+
+boolean addFriend(int id) {
+  boolean flag = false;
+  println(friendsCnt);
+  for (int i = 0; i < friendsCnt; i++) {
+    if(friendIds[i] == id) {
+      flag = true;
+      break;
+    }
+  }
+  
+  if(!flag) {
+    println("add friend : " + id);
+    friendIds[friendsCnt] = id;
+    friendsCnt++;
+  }
+  
+  return !flag;
 }

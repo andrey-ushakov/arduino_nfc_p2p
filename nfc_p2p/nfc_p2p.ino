@@ -70,6 +70,11 @@ void loop() {
         //Serial.println("Client : Msg was sent");
       } else {
         //Serial.println("Client : Nothing to send");
+        //Serial.println(sID);
+        //bufferMsg[0] = sID;
+        //msgLength = 1;
+        //length = setCharNdef(ndefBuf, bufferMsg, msgLength*sizeof(uint8_t));
+        //nfc.put(ndefBuf, length); // send character data
       }
 
   }
