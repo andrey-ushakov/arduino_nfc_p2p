@@ -7,7 +7,6 @@ GTextArea chatArea;
 int chatH = 150;
 GTextField msgField;
 int msgFieldH = 20;
-//GButton sendBtn;
 
 int sID = 0;
 int friendIds[] = new int[5];
@@ -31,9 +30,6 @@ void setup() {
   println(portName);
   arduinoPort = new Serial(this, portName, 9600);
   arduinoPort.bufferUntil('\n');
-  
-  //sendBtn = new GButton(this, 0, 0, 120, 30);
-  //sendBtn.setText("Send!");
 }
 
 
@@ -46,7 +42,7 @@ void draw() {
   //my planet
   fill(c1);
   ellipse(width/2, height/2-msgFieldH/2-chatH/2-5, 120, 120);
-  text(sID, width/2-30, height/2-msgFieldH/2-chatH/2-5 + 100);
+  text("Planet #"+sID, width/2-60, height/2-msgFieldH/2-chatH/2-5 + 100);
   
   
   
@@ -56,11 +52,11 @@ void draw() {
     if(i == 0) {
       fill(c2);
       ellipse(120, 120, 90, 90);
-      text(friendIds[i], 90, 200);
+      text("Planet #"+friendIds[i], 60, 200);
     } else if(i == 1) {
       fill(c3);
       ellipse(680, 120, 90, 90);
-      text(friendIds[i], 650, 200);
+      text("Planet #"+friendIds[i], 620, 200);
     }
   }
 }
@@ -115,7 +111,7 @@ void serialEvent (Serial myPort) {
         int friendID = int(inBuffer[0]);
         addFriend(friendID);
         String strMsg = new String(inBuffer, 0, cnt);
-        String chatMsg = "He (" + int(friendID) + ") :" + strMsg.substring(1);
+        String chatMsg = "He (#" + int(friendID) + ") :" + strMsg.substring(1);
         chatArea.appendText(chatMsg);
       //}
     }
