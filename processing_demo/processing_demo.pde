@@ -17,6 +17,7 @@ color c2         = color(0, 255, 0);
 color c2_blink   = color(0, 128, 0);
 color c3         = color(0, 0, 255);
 color c3_blink   = color(0, 0, 128);
+color textColor  = color(90);
 
 void setup() {
   size(800, 600);
@@ -37,13 +38,17 @@ void draw() {
   background(204);
   
   noStroke();
-  textSize(32);
+  textSize(28);
   
-  //my planet
+  // My planet
   fill(c1);
   ellipse(width/2, height/2-msgFieldH/2-chatH/2-5, 120, 120);
-  text("Planet #"+sID, width/2-60, height/2-msgFieldH/2-chatH/2-5 + 100);
-  
+  String myPlanetLbl = "My planet";
+  if(sID != 0) { // sID already defined
+    myPlanetLbl += " #" + sID;
+  }
+  fill(textColor);
+  text(myPlanetLbl, width/2-90, height/2-msgFieldH/2-chatH/2-5 + 100);
   
   
   
@@ -52,11 +57,13 @@ void draw() {
     if(i == 0) {
       fill(c2);
       ellipse(120, 120, 90, 90);
-      text("Planet #"+friendIds[i], 60, 200);
+      fill(textColor);
+      text("Planet #"+friendIds[i], 40, 200);
     } else if(i == 1) {
       fill(c3);
       ellipse(680, 120, 90, 90);
-      text("Planet #"+friendIds[i], 620, 200);
+      fill(textColor);
+      text("Planet #"+friendIds[i], 600, 200);
     }
   }
 }
@@ -79,22 +86,14 @@ public void handleTextEvents(GEditableTextControl textControl, GEvent event) {
   }
 }
 
-/*
-void handleButtonEvents(GButton button, GEvent event) {
-  String msg = msgField.getText();
-  println(msg);
-  chatArea.appendText(msg + "\n");
-  msgField.setText("");
-}*/
-
 
 void serialEvent (Serial myPort) {
-  println("event !");
   byte[] inBuffer = new byte[128];
   while (myPort.available() > 0) {
     //inBuffer = myPort.readBytes();
     myPort.readBytes(inBuffer);
     if (inBuffer != null) {
+      // Message length
       int cnt = 0;
       for(int i=0; i<128; i++) {
         if(int(inBuffer[i]) != 13) {
@@ -103,17 +102,18 @@ void serialEvent (Serial myPort) {
           break;
         }
       }
-      println(cnt);
       
-      //if(cnt == 1) {  // received own sID
-      //  sID = int(inBuffer[0]);
-      //} else {
+      println("Msg length: " + cnt);
+      
+      if(cnt == 1) {  // received own sID
+        sID = int(inBuffer[0]);
+      } else {
         int friendID = int(inBuffer[0]);
         addFriend(friendID);
         String strMsg = new String(inBuffer, 0, cnt);
-        String chatMsg = "He (#" + int(friendID) + ") :" + strMsg.substring(1);
+        String chatMsg = "He (#" + int(friendID) + "): " + strMsg.substring(1);
         chatArea.appendText(chatMsg);
-      //}
+      }
     }
   }
 }
@@ -123,7 +123,7 @@ void serialEvent (Serial myPort) {
 
 boolean addFriend(int id) {
   boolean flag = false;
-  println(friendsCnt);
+  //println(friendsCnt);
   for (int i = 0; i < friendsCnt; i++) {
     if(friendIds[i] == id) {
       flag = true;
@@ -132,7 +132,7 @@ boolean addFriend(int id) {
   }
   
   if(!flag) {
-    println("add friend : " + id);
+    //println("add friend : " + id);
     friendIds[friendsCnt] = id;
     friendsCnt++;
   }
