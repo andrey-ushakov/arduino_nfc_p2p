@@ -90,6 +90,7 @@ void loop() {
       } else {
         //Serial.println("Server : Nothing to receive");
       }
+      delay(250);
   }
   else{
       //Serial.println("timeout");
@@ -97,9 +98,9 @@ void loop() {
   
   
   //Serial.print("disconnect: ");
-  int discRes = nfc.disconnect(500);
+  //int discRes = nfc.disconnect(500);
   //Serial.println(discRes);
-  delay(3000);
+  delay(250);
 
 }
 
@@ -165,12 +166,4 @@ void prependMessageBySid() {
   }
   bufferMsg[0] = sID;
   msgLength++;
-  
-  /*for(int i = 0; i<msgLength; ++i) {
-    Serial.print(bufferMsg[i]);
-  }
-  Serial.println("");*/
 }
-
-//190
-//65533
